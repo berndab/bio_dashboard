@@ -66,29 +66,32 @@ function buildCharts(sampleId){
 
     function buildBarChart(sample) {
 
-        var sortSampleVals  = sample.sample_values.sort((a, b) => {a - b});
-        var sortSampleVals  = sortSampleVals.slice(0,10);
-        var sortSampleIndex = 0;
+        var valuesSorted  = sample.sample_values.sort((a, b) => Number.parseInt(a) - Number.parseInt(b));
+        var valuesSorted  = valuesSorted.slice(-10);
+        var valuesSortedIndex = 0;
 
-        var otu_id_labels = new Array();
+        var otu_ids = new Array();
+        var otu_labels = new Array();
         
-        for (samplesIndex = 0; samplesIndex < sample.sample_values.length; samplesIndex++){
+        for (sampleIndex = 0; sampleIndex < sample.sample_values.length; sampleIndex++){
 
-            if (sortSampleVals[sortSampleIndex] === sample.sample_values[samplesIndex]){
+            if (valuesSorted[valuesSortedIndex] === sample.sample_values[sampleIndex]){
                 
-                otu_id_labels.push( "OTU Id " + sample.otu_ids[sortSampleIndex] + " ");
+                otu_ids.push( "OTU Id " + sample.otu_ids[sampleIndex] + " ");
+                otu_labels.push(sample.otu_labels[sampleIndex].replace(/;/g, "</br>"));
                 
-                sortSampleIndex++;
+                valuesSortedIndex++;
                 
-                if (sortSampleIndex === 10){
+                if (valuesSortedIndex === 10){
                     break;
                 }
             }
         }
 
         var trace = {
-           x: sortSampleVals,
-           y: otu_id_labels,
+           x: valuesSorted,
+           y: otu_ids,
+           text: otu_labels,
            type: "bar",
            orientation: "h"
         };
@@ -125,15 +128,18 @@ function buildCharts(sampleId){
     }
 
     function buildBubbleChart(sample){
-
+        
+        var colors = sample.otu_ids.map((value) => "'rgb( 0, " + ( Math.round( ((value/3500)*255) ) ) + ", 128)'");
+        
         var trace = {
             x: sample.otu_ids,
             y: sample.sample_values,
             text: sample.otu_labels.map((otu_label) => otu_label.replace(/;/g, "</br>")),
             mode: 'markers',
             marker: {
-                size: sample.sample_values,
-                sizemode: 'area'
+                size: sample.sample_values.map((values) => values * 10),
+                sizemode: 'area',
+                color: colors
             }
         };
   
@@ -142,8 +148,8 @@ function buildCharts(sampleId){
         var layout = {
             title: 'Bacteria Distribution',
             showlegend: false,
-            height: 600,
-            width: 600
+            xaxis: {title: "OTU Id"},
+            yaxis: {title: "Sample Count"},
         };
         
         Plotly.newPlot('bubble', data, layout);
