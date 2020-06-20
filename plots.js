@@ -38,11 +38,14 @@ function buildMetadata(sampleId) {
         var sampleMetadata = metadataArray.filter((sampleMetadata) => sampleMetadata.id == sampleId)[0];
         var tbody = d3.select("#sample-metadata");
         var tr;
-        
+        var tdName
+        ''
         tbody.html("");
         Object.entries(sampleMetadata).forEach((nameValuePair) => {
             tr = tbody.append("tr");
-            tr.append("td").text(nameValuePair[0]);
+            tdname = tr.append("td")
+            tdname.text(nameValuePair[0]);
+            tdname.style("padding-right", "10px");
             tr.append("td").text(nameValuePair[1]);
         }); 
     });
@@ -93,34 +96,44 @@ function buildCharts(sampleId){
            y: otu_ids,
            text: otu_labels,
            type: "bar",
-           orientation: "h"
+           orientation: "h",
+           marker: { color: "#6c757d" }
         };
 
         var data = [trace];
 
         var layout = {
-            title: "Top 10 Bacteria Species Found",
+            //title: "Top 10 Bacteria Species Found",
             xaxis: {title: "Sample Count"},
             yaxis: {title: "OTU Id"},
+            margin: {l: 110}
         };
 
         Plotly.newPlot("bar", data, layout);     
     }
 
     function buildGuageChart(){
-        var data = [
-            {
+
+        var data = [{
                 domain: { x: [0, 1], y: [0, 1] },
-                value: 270,
-                title: { text: "Speed" },
+                value: 7,
+                //title: { text: "Washing Frequency" },
                 type: "indicator",
-                mode: "gauge+number"
-            }
-        ];
+                mode: "gauge",
+                marker: { color: "#6c757d" },
+                steps: [
+                    { range: [0, 1], color: "#e8e2ca" },
+                    { range: [1, 2], color: "cyan" },
+                    { range: [2, 3], color: "cyan" },
+                    { range: [3, 4], color: "cyan" },
+                    { range: [4, 5], color: "cyan" },
+                    { range: [5, 6], color: "cyan" },
+                    { range: [6, 7], color: "cyan" }]
+        }];
         
         var layout = { 
-            width: 500, 
-            height: 500, 
+            width: 400, 
+            height: 400, 
             margin: { t: 0, b: 0 }
         };
 
@@ -129,7 +142,7 @@ function buildCharts(sampleId){
 
     function buildBubbleChart(sample){
         
-        var colors = sample.otu_ids.map((value) => "'rgb( 0, " + ( Math.round( ((value/3500)*255) ) ) + ", 128)'");
+        var colors = sample.otu_ids.map((value) => "'rgb("  + ( Math.round( ((value/3500)*255) ) ) + ", " + ( 255 - Math.round( ((value/3500)*255) ) ) + ","  + ( Math.round( ((value/3500)*255) ) ) + ")'");
         
         var trace = {
             x: sample.otu_ids,
@@ -146,7 +159,7 @@ function buildCharts(sampleId){
         var data = [trace];
         
         var layout = {
-            title: 'Bacteria Distribution',
+            //title: 'Bacteria Distribution',
             showlegend: false,
             xaxis: {title: "OTU Id"},
             yaxis: {title: "Sample Count"},
