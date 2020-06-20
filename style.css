@@ -9,3 +9,8 @@
 .objects-centered {
     margin:auto;
 }
+
+.table-demographics {
+    font-size: small;
+    padding:3px;
+}

@@ -12,7 +12,9 @@ function init() {
             selector
             .append("option")
             .text(sampleId)
-            .property("value", sampleId);
+            .attr("value", sampleId)
+            .attr("class", "bg-dark text-white");
+
         });
 
         optionChanged(sampleids[0]);
@@ -30,23 +32,35 @@ function optionChanged(selectedSampleId) {
     buildCharts(selectedSampleId);
 }
 
+var tbody = d3.select("#sample-metadata");
 
 function buildMetadata(sampleId) {
 
     d3.json("samples.json").then((data) => {
         var metadataArray = data.metadata;
         var sampleMetadata = metadataArray.filter((sampleMetadata) => sampleMetadata.id == sampleId)[0];
-        var tbody = d3.select("#sample-metadata");
-        var tr;
-        var tdName
-        ''
+        var location;
+
         tbody.html("");
         Object.entries(sampleMetadata).forEach((nameValuePair) => {
-            tr = tbody.append("tr");
-            tdname = tr.append("td")
-            tdname.text(nameValuePair[0]);
-            tdname.style("padding-right", "10px");
-            tr.append("td").text(nameValuePair[1]);
+            
+            if (nameValuePair[0] !== "location") {
+                tr = tbody.append("tr");
+                tr.append("td").text(nameValuePair[0].substring(0,1).toUpperCase() + nameValuePair[0].substring(1))
+                tr.append("td").text(nameValuePair[1]);
+            }
+            else {
+                location = nameValuePair[1].split(/\/|,/);
+                location[1] = location[1] !== undefined?location[1]:"";
+                tr = tbody.append("tr");
+                tr.append("td").text("City")
+                tr.append("td").text(location[0]);
+                tr = tbody.append("tr");
+                tr.append("td").text("State")
+                tr.append("td").text(location[1]);
+
+
+            }
         }); 
     });
 
