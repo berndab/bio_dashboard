@@ -5,14 +5,14 @@
 function init() {
 
     // Reference to sample id select control
-    var selectControl = d3.select("#selDataset");
+    let selectControl = d3.select("#selDataset");
 
     // Load the data files
     d3.json("samples.json").then((data) => {
         
         //Get the sample ids from
         //the data file
-        var sampleids = data.names;
+        let sampleids = data.names;
 
         // For each sample id number
         // create a select control option
@@ -57,7 +57,7 @@ function optionChanged(selectedSampleId) {
 // efficient to only get the reference once. It 
 // does not need to be selected each time a new
 // sample id is selected in the select control. 
-var tbody = d3.select("#sample-metadata");
+let tbody = d3.select("#sample-metadata");
 
 
 // This function populates the sample id's
@@ -69,15 +69,10 @@ function buildMetadata(sampleId) {
     d3.json("samples.json").then((data) => {
 
         // Get the metadata object
-        var metadataArray = data.metadata;
+        let metadataArray = data.metadata;
 
         // Get the sample id's metadata
-        var sampleMetadata = metadataArray.filter((sampleMetadata) => sampleMetadata.id == sampleId)[0];
-        
-        // Var to process location information
-        // which is populated as city/location
-        // or city,location
-        var location;
+        let sampleMetadata = metadataArray.filter((sampleMetadata) => sampleMetadata.id == sampleId)[0];
 
         // Clear the table body
         // or the metadata HTML table
@@ -109,8 +104,9 @@ function buildMetadata(sampleId) {
 
                  // Append a table cell element to the
                 // table row element with the field value
-                tr.append("td").text(nameValuePair[1]);
+                tr.append("td").text(nameValuePair[1] !== null && nameValuePair[1]  !== undefined?nameValuePair[1]:"");
             }
+
             // If the name value pair IS location information, set the 
             // name value pair's field value to the variable location. 
             // Split the location variable into city name and state name. 
@@ -119,14 +115,37 @@ function buildMetadata(sampleId) {
             // table row with the string 'State' in cell one and the state
             // name in cell 2.  
             else {
-                location = nameValuePair[1].split(/\/|,/);
-                location[1] = location[1] !== undefined?location[1]:"";
+
+                let city;
+                let state;
+                let locationArray
+
+                if (location[1] === null || location[1] === undefined) {
+                    city = "";
+                    state = "";
+                }
+                else if ((locationArray = nameValuePair[1].split(/\/|,/)).length === 1){
+                    if (locationArray[0].length > 2 ){
+                        city  = locationArray[0];
+                        state = "";
+                    }
+                    else {
+                        city  = "";
+                        state = locationArray[0];
+                    }
+                }
+                else {
+                    city  = locationArray[0];
+                    state = locationArray[0];;
+                }
+
                 tr = tbody.append("tr");
                 tr.append("td").text("City")
-                tr.append("td").text(location[0]);
+                tr.append("td").text(city);
+
                 tr = tbody.append("tr");
                 tr.append("td").text("State")
-                tr.append("td").text(location[1]);
+                tr.append("td").text(state);
 
 
             }
@@ -147,7 +166,7 @@ function buildCharts(sampleId){
     d3.json("samples.json").then((data) => {
 
         // Gets the sample id's sample data from data object
-        var sampleData  = data.samples.filter((sampleData) => sampleData.id == sampleId)[0];
+        let sampleData  = data.samples.filter((sampleData) => sampleData.id == sampleId)[0];
 
         // Create the bar chart 
         buildBarChartTop10(sampleData);
@@ -162,40 +181,32 @@ function buildCharts(sampleId){
 
     function buildBarChartTop10(sampleData) {
 
-        var valuesSorted  = sampleData.sample_values.sort((a, b) => Number.parseInt(a) - Number.parseInt(b));
-        var valuesSorted  = valuesSorted.slice(-10);
-        var valuesSortedIndex = 0;
+        let top10SampleValues  = sampleData.sample_values.slice(0,10).reverse();
+        let top10OtuIds        = sampleData.otu_ids.slice(0,10).reverse().map(function(otu_id){
 
-        var otu_ids = new Array();
-        var otu_labels = new Array();
-        
-        for (sampleIndex = 0; sampleIndex < sampleData.sample_values.length; sampleIndex++){
+                                            let otu_id_str = otu_id.toString();
+            
+                                            if (otu_id_str.length !== 4){
+                                                otu_id_str =  otu_id_str.length === 2?"    " + otu_id_str:"  " + otu_id_str;
 
-            if (valuesSorted[valuesSortedIndex] === sampleData.sample_values[sampleIndex]){
-                
-                otu_ids.push( "OTU Id " + sampleData.otu_ids[sampleIndex] + " ");
-                otu_labels.push(sampleData.otu_labels[sampleIndex].replace(/;/g, "</br>"));
-                
-                valuesSortedIndex++;
-                
-                if (valuesSortedIndex === 10){
-                    break;
-                }
-            }
-        }
-
-        var trace = {
-           x: valuesSorted,
-           y: otu_ids,
-           text: otu_labels,
+                                            }
+            
+                                            return "OTU Id " + otu_id_str + " ";
+                                        });
+        let top10OtuLabels     = sampleData.otu_labels.slice(0,10).reverse().map((otu_label) => otu_label.replace(/;/g, "</br>"));
+    
+        let trace = {
+           x: top10SampleValues,
+           y: top10OtuIds,
+           text: top10OtuLabels,
            type: "bar",
            orientation: "h",
            marker: { color: "#6c757d" }
         };
 
-        var data = [trace];
+        let data = [trace];
 
-        var layout = {
+        let layout = {
             //title: "Top 10 Bacteria Species Found",
             xaxis: {title: "Sample Count"},
             yaxis: {title: "OTU Id"},
@@ -207,30 +218,29 @@ function buildCharts(sampleId){
 
     function buildGuageChartWashFreq(){
 
-
-        path = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L `X` `Y` Z' : 'M -0.025 -0.0 L 0.025 0.0 L `X` `Y` Z'
+        //let path = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L `X` `Y` Z' : 'M -0.025 -0.0 L 0.025 0.0 L `X` `Y` Z'
 // Enter a speed between 0 and 180
-var level = 90;
+let level = 90;
 
 // Trig to calc meter point
-var degrees = 180 - level,
+let degrees = 180 - level,
      radius = .5;
-var radians = degrees * Math.PI / 180;
-var x = radius * Math.cos(radians);
-var y = radius * Math.sin(radians);
-var path1 = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L ' : 'M -0.025 -0.0 L 0.025 0.0 L ';
+let radians = degrees * Math.PI / 180;
+let x = radius * Math.cos(radians);
+let y = radius * Math.sin(radians);
+let path1 = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L ' : 'M -0.025 -0.0 L 0.025 0.0 L ';
 // Path: may have to change to create a better triangle
-var mainPath = path1,
+let mainPath = path1,
      pathX = String(x),
      space = ' ',
      pathY = String(y),
      pathEnd = ' Z';
-var path = mainPath.concat(pathX,space,pathY,pathEnd);
+let path = mainPath.concat(pathX,space,pathY,pathEnd);
 
 
 
 
-        var data = [
+        let data = [
             {   
                 type: 'scatter',
                 x: [0], 
@@ -271,7 +281,7 @@ var path = mainPath.concat(pathX,space,pathY,pathEnd);
                 type: 'pie'
         }];
 
-        var layout = {
+        let layout = {
             height: 450,
             width: 420
         };
@@ -294,9 +304,9 @@ var path = mainPath.concat(pathX,space,pathY,pathEnd);
             }
         };
   
-        var data = [trace];
+        let data = [trace];
         
-        var layout = {
+        let layout = {
             //title: 'Bacteria Distribution',
             showlegend: false,
             xaxis: {title: "OTU Id"},
