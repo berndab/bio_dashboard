@@ -87,24 +87,54 @@ function buildMetadata(sampleId) {
         // value at location 1
         Object.entries(sampleMetadata).forEach((nameValuePair) => {
             
+            // Append a table row HTML elemement
+            // to the table body element 
+            tr = tbody.append("tr");
             
             // If the name value pair IS NOT location
-            // information, populate the HTML table row
-            // with the name value pair's field name in 
-            // cell 1 and the field value in cell 2
-            if (nameValuePair[0] !== "location") {
-
-                // Append a table row HTML elemement
-                // to the table body element 
-                tr = tbody.append("tr");
-                
+            // information or ethnicity information, 
+            // populate the HTML table row with the 
+            // name value pair's field name in cell 1 
+            // and the field value in cell 2
+            if (nameValuePair[0] !== "location" && nameValuePair[0] !== "ethnicity") {
+               
                 // Append a table cell element to the
                 // table row element with the field name
+                // with the first letter of the name capitalized
                 tr.append("td").text(nameValuePair[0].substring(0,1).toUpperCase() + nameValuePair[0].substring(1));
 
-                 // Append a table cell element to the
+                // Append a table cell element to the
                 // table row element with the field value
-                tr.append("td").text(nameValuePair[1] !== null && nameValuePair[1]  !== undefined?nameValuePair[1]:"");
+                tr.append("td").text(nameValuePair[1] !== null && nameValuePair[1]  !== undefined ?nameValuePair[1]:"");
+            }
+            // Some ethnicity properties contain 2 ethnicities such as Caucasian/Asian
+            else if (nameValuePair[0] === "ethnicity"){
+
+                // Append a table cell element to the
+                // table row element with the field name
+                // with the first letter of the name capitalized
+                tr.append("td").text(nameValuePair[0].substring(0,1).toUpperCase() + nameValuePair[0].substring(1));
+
+                // Append a table cell element to the
+                // table row element with the ethnicity 
+                // field value. Replace the "/"" character
+                // for values with multiple ethnicities 
+                // with an HTML <br/> element.
+                if (nameValuePair[1] === null && nameValuePair[1]  === undefined ){
+                    return;
+                }
+
+                let ethnicityArray = nameValuePair[1].split("\/");
+
+                tr.append("td").text(ethnicityArray[0]);
+
+                if(ethnicityArray.length > 1){
+
+                    tr = tbody.append("tr");
+                    tr.append("td")
+                    tr.append("td").text(ethnicityArray[1]);        
+
+                }
             }
 
             // If the name value pair IS location information, set the 
@@ -118,9 +148,9 @@ function buildMetadata(sampleId) {
 
                 let city;
                 let state;
-                let locationArray
+                let locationArray;
 
-                if (location[1] === null || location[1] === undefined) {
+                if (nameValuePair[1] === null || nameValuePair[1] === undefined) {
                     city = "";
                     state = "";
                 }
@@ -136,10 +166,9 @@ function buildMetadata(sampleId) {
                 }
                 else {
                     city  = locationArray[0];
-                    state = locationArray[0];;
+                    state = locationArray[1];;
                 }
 
-                tr = tbody.append("tr");
                 tr.append("td").text("City")
                 tr.append("td").text(city);
 
