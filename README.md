@@ -1,4 +1,4 @@
-# Bio Dashboard
+# [Bio Dashboard](https://berndab.github.io/bio_dashboard/)
 
 ## Purpose
 
