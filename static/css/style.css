@@ -1,8 +1,15 @@
 .jumbotron {
-    background-image: url("lab.png");
+    background-image: url("../img/lab.png");
     background-size: 100% 100%;
     text-align: center;
     color:white;
+}
+
+.jumbotron .card {
+    margin-top:182px; 
+    margin-left:auto; 
+    margin-right:auto; 
+    width:597px;
 }
 
 .objects-centered {
@@ -27,3 +34,10 @@
     border-width:medium; 
     font-size: xx-large; 
 }
+
+/*
+#gauge {
+    height:229px !important;
+    overflow:hidden
+}
+*/

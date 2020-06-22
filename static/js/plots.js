@@ -197,20 +197,27 @@ function buildCharts(sampleId){
         // Gets the sample id's sample data from data object
         let sampleData  = data.samples.filter((sampleData) => sampleData.id == sampleId)[0];
 
-        // Create the bar chart 
+        // Create the bar chart of the top 10 bacteria by count
         buildBarChartTop10(sampleData);
 
-        // Create the gauge chart
-        buildGuageChartWashFreq();
+        // get the sample id's metadata
+        let sampleMetadata = data.metadata.filter((sampleMetadata) => sampleMetadata.id == sampleId)[0];
+ 
+        // Create the gauge chart of the wash frequency
+        buildGuageChartWashFreq(sampleMetadata.wfreq);
 
-        // Create bubble chart
+        // Create bubble chart of the bacteria distribution
         buildBubbleChartBactDist(sampleData);
 
     });
 
     function buildBarChartTop10(sampleData) {
 
+        //The sample data is sorted in decending order
+        //Get the top 10 sample values in decending order
         let top10SampleValues  = sampleData.sample_values.slice(0,10).reverse();
+
+        // Get the OTU ids for the top 10 sample values
         let top10OtuIds        = sampleData.otu_ids.slice(0,10).reverse().map(function(otu_id){
 
                                             let otu_id_str = otu_id.toString();
@@ -222,8 +229,14 @@ function buildCharts(sampleId){
             
                                             return "OTU Id " + otu_id_str + " ";
                                         });
+
+        // Get the OTU lables for the to 10 sample values
+        // Replace the ";" in the sample OTU labels with a <br/> element
+        // This make the display of the OTU labels more readable
         let top10OtuLabels     = sampleData.otu_labels.slice(0,10).reverse().map((otu_label) => otu_label.replace(/;/g, "</br>"));
-    
+        
+
+        // Create bar chart
         let trace = {
            x: top10SampleValues,
            y: top10OtuIds,
@@ -236,7 +249,6 @@ function buildCharts(sampleId){
         let data = [trace];
 
         let layout = {
-            //title: "Top 10 Bacteria Species Found",
             xaxis: {title: "Sample Count"},
             yaxis: {title: "OTU Id"},
             margin: {l: 110}
@@ -245,74 +257,81 @@ function buildCharts(sampleId){
         Plotly.newPlot("bar", data, layout);     
     }
 
-    function buildGuageChartWashFreq(){
+    function buildGuageChartWashFreq(wfreq){
 
-        //let path = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L `X` `Y` Z' : 'M -0.025 -0.0 L 0.025 0.0 L `X` `Y` Z'
-// Enter a speed between 0 and 180
-let level = 90;
+        let pointerLocation = Math.floor(wfreq);
 
-// Trig to calc meter point
-let degrees = 180 - level,
-     radius = .5;
-let radians = degrees * Math.PI / 180;
-let x = radius * Math.cos(radians);
-let y = radius * Math.sin(radians);
-let path1 = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L ' : 'M -0.025 -0.0 L 0.025 0.0 L ';
-// Path: may have to change to create a better triangle
-let mainPath = path1,
-     pathX = String(x),
-     space = ' ',
-     pathY = String(y),
-     pathEnd = ' Z';
-let path = mainPath.concat(pathX,space,pathY,pathEnd);
+        // Trig to calc meter point
+        var degrees = 180 - 10 - (pointerLocation * 20),
+            radius = .5;
+        var radians = degrees * Math.PI / 180;
+        var x = radius * Math.cos(radians);
+        var y = radius * Math.sin(radians);
+        var path1 = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L ' : 'M -0.025 -0.0 L 0.025 0.0 L ';
+        // Path: may have to change to create a better triangle
+        var mainPath = path1,
+            pathX = String(x),
+            space = ' ',
+            pathY = String(y),
+            pathEnd = ' Z';
+        var path = mainPath.concat(pathX,space,pathY,pathEnd);
 
-
-
-
-        let data = [
-            {   
+        var data = 
+        [
+            {
                 type: 'scatter',
-                x: [0], 
+                x: [0],
                 y:[0],
                 marker: {size: 14, color:'850000'},
                 showlegend: false,
-                name: 'speed',
-                text: level,
+                name: 'Wash Frequence',
+                text: wfreq,
                 hoverinfo: 'text+name'
             },
-            {
-                values: [1, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-                text: ["0-1", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", "7-8", "8-9", ""],
-                textinfo: "text",
-                textposition: "inside",
-                showlegend: false,
-                marker: 
-                {
-                    colors: 
-                    [
-                        "rgba( 14, 127,   0, .5)",
-                        "rgba(110, 154,  22, .5)",
-                        "rgba(170, 202,  42, .5)",
-                        "rgba(202, 209,  95, .5)",
-                        "rgba(210, 206, 145, .5)",
-                        "rgba(232, 226, 202, .5)",
-                        "rgba(242, 236, 202, .5)",
-                        "rgba(252, 246, 212, .5)",
-                        "rgba(255, 255, 212, .5)",
-                        "rgba(255, 255, 255, .5)"
-                    ]
-                },
+            { 
+                values: [1,1,1,1,1,1,1,1,1,9],
                 rotation: 90,
-                margin: { l: 0, r: 0, b: 0, t: 0, pad: 0},
+                text: ["8-9", "7-8", "6-7", "5-6", "4-5", "3-4", "2-3", "1-2", "0-1", ""],
+                textinfo: 'text',
+                textposition:'inside',
+                marker: {
+                            colors:
+                            [
+                                'rgba(000, 050, 000,  0.5)'
+                                ,'rgba(000, 100, 000,  0.5)'
+                                ,'rgba(000, 150, 000,  0.5)'
+                                ,'rgba(050, 210, 050,  0.5)'
+                                ,'rgba(075, 240, 075,  0.5)'
+                                ,'rgba(125, 230, 125,  0.5)'
+                                ,'rgba(225, 225, 110,  0.5)'
+                                ,'rgba(255, 255, 150,  0.5)'
+                                ,'rgba(255, 255, 204,  0.5)'
+                                ,'rgba(255, 255, 255,  0.5)'
+                            ]
+                        },
+                hoverinfo: 'label',
                 hole: .5,
-                autosize: false,
-                 
-                type: 'pie'
-        }];
+                type: 'pie',
+                showlegend: false
+             }
+        ];
 
-        let layout = {
-            height: 450,
-            width: 420
+        var layout = 
+        {
+            shapes:
+            [
+                {
+                    type: 'path',
+                    path: path,
+                    fillcolor: '850000',
+                    line: {color: '850000'}
+                }
+            ],
+            title: "Scrubs Per Week",
+            height: 400,
+            width: 400,
+            xaxis: {zeroline:false, showticklabels:false, showgrid: false, range: [-1, 1]},
+            yaxis: {zeroline:false, showticklabels:false, showgrid: false, range: [-1, 1]}
         };
 
         Plotly.newPlot('gauge', data, layout);        
@@ -320,9 +339,14 @@ let path = mainPath.concat(pathX,space,pathY,pathEnd);
 
     function buildBubbleChartBactDist(sampleData){
         
+
+        // Create a buble chart sample counts by OTU ids
         var trace = {
             x: sampleData.otu_ids,
             y: sampleData.sample_values,
+
+            // Replace the ";" in the sample OTU labels with a <br/> element
+            // This make the display of the OTU labels more readable
             text: sampleData.otu_labels.map((otu_label) => otu_label.replace(/;/g, "</br>")),
             mode: 'markers',
             marker: {
@@ -336,7 +360,6 @@ let path = mainPath.concat(pathX,space,pathY,pathEnd);
         let data = [trace];
         
         let layout = {
-            //title: 'Bacteria Distribution',
             showlegend: false,
             xaxis: {title: "OTU Id"},
             yaxis: {title: "Sample Count"},

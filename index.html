@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Bacteria Biodiversity Dashboard</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body class="bg-secondary">
   <div class="container">
@@ -15,38 +15,29 @@
         <br/>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-12">
+    <div class="row justify-content-center">
+      <div class="col-md-10">
         <div class="bg-dark title-text">
           Bacteria Biodiversity Dashboard
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-12"> 
-        <div class="jumbotron text-center" style="height:300px">
-        </div>
-      </div>
-    </div>
     <div class="row justify-content-center">
-      <div class="col-md-7 text-white">
-        <div class="card">
-          <div class="card-header text-white text-center bg-dark">
-            Use the interactive charts below to explore the bacteria data for a sample id dataset
+      <div class="col-md-10"> 
+        <div class="jumbotron text-center" style="height:300px">
+          <div class="card">
+            <div class="card-header text-white text-center bg-dark">
+              Use the interactive charts below to explore the bacteria dataset for a sample id
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <br/>
       </div>
     </div>
     <div class="row">
       <div class="col-md-2">
         <div class="card">
           <div class="card-header text-white text-center bg-dark">
-            Test Subject Id No.:
+            Test Subject Id:
           </div>
           <div class="card-body bg-light objects-centered">
             <select id="selDataset" class="bg-dark text-white" onchange="optionChanged(this.value)">
@@ -124,7 +115,7 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script src="plots.js"></script>
+  <script src="static/js/plots.js"></script>
   </body>
 
 </html>
