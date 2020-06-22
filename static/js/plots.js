@@ -120,7 +120,7 @@ function buildMetadata(sampleId) {
                 // field value. Replace the "/"" character
                 // for values with multiple ethnicities 
                 // with an HTML <br/> element.
-                if (nameValuePair[1] === null && nameValuePair[1]  === undefined ){
+                if (nameValuePair[1] === null || nameValuePair[1]  === undefined ){
                     return;
                 }
 
