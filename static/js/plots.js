@@ -243,7 +243,7 @@ function buildCharts(sampleId){
            text: top10OtuLabels,
            type: "bar",
            orientation: "h",
-           marker: { color: "#6c757d" }
+           marker: { color: "#292b2c" }
         };
 
         let data = [trace];
@@ -292,6 +292,7 @@ function buildCharts(sampleId){
                 values: [1,1,1,1,1,1,1,1,1,9],
                 rotation: 90,
                 text: ["8-9", "7-8", "6-7", "5-6", "4-5", "3-4", "2-3", "1-2", "0-1", ""],
+                labels : ["8-9", "7-8", "6-7", "5-6", "4-5", "3-4", "2-3", "1-2", "0-1", ""],
                 textinfo: 'text',
                 textposition:'inside',
                 marker: {
